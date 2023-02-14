@@ -1,0 +1,46 @@
+name: Import posts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/import-posts.yml
+      - 2**.md
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Pull importer
+        run: |
+          docker pull mizuochik/textvid-importer:$TAG
+          docker tag mizuochik/textvid-importer:$TAG mizuochik/textvid-importer:latest
+        env:
+          TAG: 093e341015d74a3f79d584f4a152d7b4d1989fde
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-northeast-1
+          role-to-assume: arn:aws:iam::600279912639:role/GitHubPipeline
+      - name: Make a aws env file
+        run: |
+          cat <<ENV > env
+          AWS_DEFAULT_REGION=ap-northeast-1
+          AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+          AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+          AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+          ENV
+          aws configure set region ap-northeast-1
+      - name: Import posts
+        run: |
+          git pull --depth=20
+          targets=$(git diff --stat ${{ github.event.before }}..${{ github.event.after }} | grep md | awk '{print $1}')
+          for t in $targets
+          do
+            docker run -i --env-file=env -v $PWD:/app mizuochik/textvid-importer:latest --table TextvidTest $t
+          done
