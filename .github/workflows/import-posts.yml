@@ -42,5 +42,5 @@ jobs:
           targets=$(git diff --stat ${{ github.event.before }}..${{ github.event.after }} | grep md | awk '{print $1}')
           for t in $targets
           do
-            docker run -i --env-file=env -v $PWD:/app mizuochik/textvid-importer:latest --table TextvidTest $t
+            docker run -i --env-file=env -v $PWD:/app mizuochik/textvid-importer:latest --table MizuochikTechBlog $t
           done
