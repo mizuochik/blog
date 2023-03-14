@@ -4,6 +4,8 @@ tags:
   - プログラミングビットコイン
   - 技術書
   - Zig
+image: https://mizuochik-dev-blog.s3.ap-northeast-1.amazonaws.com/elliptic-curve-add.png
+description: 前回に引き続き、プログラミングビットコイン 2 章を読み進めて行きます。
 ---
 
 # プログラミングビットコインを Zig でやってみる - 2 章 楕円曲線
